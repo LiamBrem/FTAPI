@@ -1,6 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from views import parentStudentviews
 
 app = Flask(__name__)
+
+app.register_blueprint(parentStudentviews.user_bp)
+
 
 
 @app.route("/")
