@@ -1,26 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
-from views import parentStudentviews
+from flask_restful import Resource, Api
+from flask_sqlalchemy import SQLAlchemy
+
+from views import parentStudentViews, teacherViews
+
 
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://liambrem:pass@localhost:5432/ft"
+db = SQLAlchemy(app)
 
-app.register_blueprint(parentStudentviews.user_bp)
+api = Api(app)
 
-
-
-@app.route("/")
-def index():
-    return "index"
-
-@app.route("/getUser/<id>", methods=["GET"])
-def getUser(id):
-    return jsonify({"id": id})
-
-
-@app.route("/createUser", methods=["POST"])
-def createUser():
-    data = request.get_json()
-    return jsonify(data)    
-
+app.register_blueprint(parentStudentViews.userBP)
 
 
 if __name__ == "__main__":
