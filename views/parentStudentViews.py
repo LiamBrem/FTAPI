@@ -1,5 +1,8 @@
 from flask import Blueprint, jsonify, request
 from flask_restful import Resource, Api
+#import the UserModel from models
+from models.user import UserModel
+from app import db
 
 userBP = Blueprint("user", __name__)
     
@@ -15,12 +18,23 @@ class User(Resource):
         return listOfStudents[id]
     
 
-    def post(self, name, age):
-        new_user = User(name=name, age=age)
-        return {"data": "Posted"}
+    def post(self, id,  name, email):
+        data = request.get_json()
+        id = data.get("id")
+        name = data.get("name")
+        email = data.get("email")
+
+        new_user = UserModel(id=id, name=name, email=email)
+
+
+        db.session.add(new_user)
+        db.session.commit()
+
+
+        return {"message": "User Created Successfully"}, 201
 
 
 
 #initialize the flask restful api using the blueprint
 api = Api(userBP)
-api.add_resource(User, "/user/<id>")
+api.add_resource(User, "/user/<id>/<name>/<email>")
