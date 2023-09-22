@@ -15,7 +15,6 @@ print(response.json())
 
 #print all entries from database
 users = UserModel.query.all()
-print("HERE")
 for user in users:
     print(user.username)
 

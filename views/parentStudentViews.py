@@ -5,20 +5,15 @@ from models.user import UserModel
 from app import db
 
 userBP = Blueprint("user", __name__)
-    
-
-listOfStudents = {
-    "1": {"name": "Liam", "email": "email:"},
-    "2": {"name": "Daws", "email": "email:"},
-    "3": {"name": "Brem", "email": "email:"}
-}
 
 class User(Resource):
     def get(self, id):
-        return listOfStudents[id]
+        return {"message": "success"}
     
 
     def post(self, id,  name, email):
+        print("here")
+        #get data 
         data = request.get_json()
         id = data.get("id")
         name = data.get("name")
@@ -30,8 +25,8 @@ class User(Resource):
         db.session.add(new_user)
         db.session.commit()
 
-
-        return {"message": "User Created Successfully"}, 201
+        
+        return {"message": "User Created Successfully"}
 
 
 
