@@ -1,6 +1,8 @@
 from flask import Flask, jsonify, request, Blueprint
 from models.user import UserModel  # Import your UserModel from models
 from app import db
+import random, string
+
 userBP = Blueprint('userBP', __name__)
 
 
@@ -12,16 +14,22 @@ def get_user(id):
         return jsonify({"message": "success", "user_id": user.id, "name": user.name, "email": user.email})
     else:
         return jsonify({"message": "User not found"}), 404
+    
+
+def makeID():
+    # create a 16 character long string of random letters (lowercase & uppercase) and digits
+    id = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=16))
+    return id
 
 
 @userBP.route('/user', methods=['POST'])
 def create_user():
-    print('HERE')
     data = request.get_json()
     if not data:
         return jsonify({"message": "Invalid input data"}), 400
 
-    id = data.get("id")
+    # generate a random 16 character long string of letters and digits
+    id = makeID()
     username = data.get("name")
     email = data.get("email")
 
