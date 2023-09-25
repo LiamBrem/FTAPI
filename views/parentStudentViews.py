@@ -1,35 +1,38 @@
-from flask import Blueprint, jsonify, request
-from flask_restful import Resource, Api
-#import the UserModel from models
-from models.user import UserModel
+from flask import Flask, jsonify, request, Blueprint
+from models.user import UserModel  # Import your UserModel from models
 from app import db
-
-userBP = Blueprint("user", __name__)
-
-class User(Resource):
-    def get(self, id):
-        return {"message": "success"}
-    
-
-    def post(self, id,  name, email):
-        print("here")
-        #get data 
-        data = request.get_json()
-        id = data.get("id")
-        name = data.get("name")
-        email = data.get("email")
-
-        new_user = UserModel(id=id, name=name, email=email)
+userBP = Blueprint('userBP', __name__)
 
 
-        db.session.add(new_user)
-        db.session.commit()
+@userBP.route('/user/<int:id>', methods=['GET'])
+def get_user(id):
+    # Assuming you want to retrieve a user with a specific ID
+    user = UserModel.query.get(id)
+    if user:
+        return jsonify({"message": "success", "user_id": user.id, "name": user.name, "email": user.email})
+    else:
+        return jsonify({"message": "User not found"}), 404
 
-        
-        return {"message": "User Created Successfully"}
 
+@userBP.route('/user', methods=['POST'])
+def create_user():
+    print('HERE')
+    data = request.get_json()
+    if not data:
+        return jsonify({"message": "Invalid input data"}), 400
 
+    id = data.get("id")
+    username = data.get("name")
+    email = data.get("email")
 
-#initialize the flask restful api using the blueprint
-api = Api(userBP)
-api.add_resource(User, "/user/<id>/<name>/<email>")
+    if not id or not username or not email:
+        return jsonify({"message": "Missing required fields"}), 400
+
+    newUser = UserModel(id=id, username=username, email=email)
+
+    # Assuming you have a database session called db_session to add and commit the user
+    db.session.add(newUser)
+    db.session.commit()
+
+    return jsonify({"message": "User Created Successfully", "user_id": newUser.id, "name": newUser.username, "email": newUser.email}), 201
+

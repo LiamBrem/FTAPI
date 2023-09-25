@@ -7,8 +7,17 @@ app.app_context().push()
 
 db.create_all()
 
-response = requests.post(BASE + "user/1/liam/email")
+user_data = {
+    "id": -1,
+    "name": "Liam",
+    "email": "email@example.com"
+}
+
+response = requests.post(BASE + "user", json=user_data)
+
+# Print the response content and status code for debugging
 print(response.json())
+print("Response Status Code:", response.status_code)
 
 
 
@@ -18,4 +27,3 @@ users = UserModel.query.all()
 for user in users:
     print(user.username)
 
-#app.app_context().pop()
