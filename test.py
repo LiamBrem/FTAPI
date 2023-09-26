@@ -1,7 +1,6 @@
 import requests
 from app import app, db
 from models.user import UserModel
-
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import sessionmaker
 
@@ -13,9 +12,9 @@ def checkHttp():
     db.create_all()
 
 
-    response = requests.get(BASE + "user/kHYMghw6DgdfKfik")
+    response = requests.post(BASE + "teacher", json={"firstname": "Heather", "lastname": "beck", "email": "Email"})
     # Print the response content and status code for debugging
-    print(response.json())
+    print(response.content)
     print("Response Status Code:", response.status_code)
 
 
