@@ -12,13 +12,8 @@ def checkHttp():
 
     db.create_all()
 
-    user_data = {
-        "name": "Dawson",
-        "email": "email.com"
-    }
 
-    response = requests.post(BASE + "user", json=user_data)
-
+    response = requests.get(BASE + "user/kHYMghw6DgdfKfik")
     # Print the response content and status code for debugging
     print(response.json())
     print("Response Status Code:", response.status_code)

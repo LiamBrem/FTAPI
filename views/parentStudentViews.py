@@ -6,12 +6,12 @@ import random, string
 userBP = Blueprint('userBP', __name__)
 
 
-@userBP.route('/user/<int:id>', methods=['GET'])
+@userBP.route('/user/<string:id>', methods=['GET'])
 def get_user(id):
     # Assuming you want to retrieve a user with a specific ID
     user = UserModel.query.get(id)
     if user:
-        return jsonify({"message": "success", "user_id": user.id, "name": user.name, "email": user.email})
+        return jsonify({"message": "success", "user_id": user.id, "name": user.username, "email": user.email})
     else:
         return jsonify({"message": "User not found"}), 404
     
@@ -22,16 +22,13 @@ def makeID():
     return id
 
 
-@userBP.route('/user', methods=['POST'])
-def create_user():
-    data = request.get_json()
-    if not data:
-        return jsonify({"message": "Invalid input data"}), 400
+@userBP.route('/user/<username>/<email>', methods=['POST'])
+def create_user(username, email):
+    print(username,email)
 
     # generate a random 16 character long string of letters and digits
     id = makeID()
-    username = data.get("name")
-    email = data.get("email")
+    print(id)
 
     if not id or not username or not email:
         return jsonify({"message": "Missing required fields"}), 400
@@ -41,6 +38,8 @@ def create_user():
     # Assuming you have a database session called db_session to add and commit the user
     db.session.add(newUser)
     db.session.commit()
+
+    print("HERE")
 
     return jsonify({"message": "User Created Successfully", "user_id": newUser.id, "name": newUser.username, "email": newUser.email}), 201
 
