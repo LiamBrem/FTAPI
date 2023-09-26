@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, Blueprint
 from models.user import UserModel  # Import your UserModel from models
-from app import db
-import random, string
+from app import db, app
+import random, string, datetime, jwt
 
 userBP = Blueprint('userBP', __name__)
 
@@ -43,3 +43,47 @@ def create_user(username, email):
 
     return jsonify({"message": "User Created Successfully", "user_id": newUser.id, "name": newUser.username, "email": newUser.email}), 201
 
+
+# Token generation function
+def generate_token(username):
+    payload = {
+        'sub': username,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)  # Token expiration time
+    }
+    token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
+    return token
+
+
+#make a login functoin that uses a token-based authentication system
+@userBP.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    #check if username and password are correct
+    user = UserModel.query.filter_by(username=username).first()
+    if user and user.password == password:
+        token = generate_token(username)
+        return jsonify({'token': token})
+    else:
+        return jsonify({'message': 'Authentication failed'}), 401
+    
+# Protected route
+# API Endpoints: In a RESTful API, the /protected route might represent a specific API endpoint 
+# that provides access to a resource. For instance, it could be used to retrieve a list of user-specific items, 
+# create new items, update existing ones, or perform other CRUD (Create, Read, Update, Delete) operations.
+### IN this program, this can be used to access the user's information
+@userBP.route('/protected', methods=['GET'])
+def protected_resource():
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({'message': 'Token is missing'}), 401
+
+    try:
+        payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        return jsonify({'message': 'Welcome, {}'.format(payload['sub'])})
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Token has expired'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': 'Invalid token'}), 401
