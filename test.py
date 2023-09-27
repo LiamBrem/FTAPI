@@ -6,16 +6,27 @@ from sqlalchemy.orm import sessionmaker
 
 
 def checkHttp():
-    BASE = "http://127.0.0.1:5000/"
     app.app_context().push()
+    BASE_URL = "http://127.0.0.1:5000"
+    student_data = {
+    "firstname": "John",
+    "lastname": "Doe",
+    "email": "johndoe@example.com",
+    "role": "student",
+    "date_of_birth": "2000-01-01", 
+    "password": "securepassword",
+    "grade": "10",    
+    }
 
-    db.create_all()
+    response = requests.post(f'{BASE_URL}/user', json=student_data)
+    if response.status_code == 201:
+        print("Student user created successfully!")
+        print(response.json())
+    else:
+        print("Error creating student user:")
+        print(response.status_code)
+        print(response.content)
 
-
-    response = requests.post(BASE + "teacher", json={"firstname": "Heather", "lastname": "beck", "email": "Email"})
-    # Print the response content and status code for debugging
-    print(response.content)
-    print("Response Status Code:", response.status_code)
 
 
 def checkDB():
@@ -44,7 +55,7 @@ checkHttp()
 
 
 #print all entries from database
-users = UserModel.query.all()
-for user in users:
-    print(user.username)
+#users = UserModel.query.all()
+#for user in users:
+#    print(user.username)
 
