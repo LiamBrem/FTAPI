@@ -1,5 +1,10 @@
 from flask import Flask, jsonify, request, Blueprint
-from models.user import UserModel  # Import your UserModel from models
+#import parent, teacher, and student models
+from models.user import UserModel
+from models.teacher import TeacherModel
+from models.student import StudentModel
+from models.parent import ParentModel
+
 from app import db, app
 import random, string, datetime, jwt
 
@@ -22,26 +27,49 @@ def makeID():
     return id
 
 
-@userBP.route('/user/<username>/<email>', methods=['POST'])
-def create_user(username, email):
-    print(username,email)
+@userBP.route('/user', methods=['POST'])
+def create_user():
+    data = request.get_json()
+    firstname = data.get('firstname')
+    lastname = data.get('lastname')
+    email = data.get('email')
+    role = data.get('role')
+    date_of_birth = data.get('date_of_birth')
+    password = data.get('password')
 
     # generate a random 16 character long string of letters and digits
     id = makeID()
     print(id)
 
-    if not id or not username or not email:
+    if not id or not firstname or not lastname or not email:
         return jsonify({"message": "Missing required fields"}), 400
+    
+    if role == "teacher":
+        # Teachers require an additional 'subject' parameter
+        subject = request.form.get('subject')
 
-    newUser = UserModel(id=id, username=username, email=email)
+        if not subject:
+            return jsonify({"message": "Missing 'subject' field for teacher"}), 400
+        newUser = TeacherModel(id=id, firstname=firstname, lastname=lastname, email=email, date_of_birth=date_of_birth, password=password, subject=subject)
+    elif role == "student":
+        # Students require an additional 'grade_level' parameter
+        grade_level = request.form.get('grade_level')
+
+        if not grade_level:
+            return jsonify({"message": "Missing 'grade_level' field for student"}), 400
+
+        newUser = StudentModel(id=id, firstname=firstname, lastname=lastname, email=email, date_of_birth=date_of_birth, password=password, grade_level=grade_level)
+    elif role == "parent":
+        newUser = ParentModel(id=id, firstname=firstname, lastname=lastname, email=email, date_of_birth=date_of_birth, password=password)
+    else:
+        return jsonify({"message": "Invalid role"}), 400
 
     # Assuming you have a database session called db_session to add and commit the user
     db.session.add(newUser)
     db.session.commit()
 
-    print("HERE")
 
-    return jsonify({"message": "User Created Successfully", "user_id": newUser.id, "name": newUser.username, "email": newUser.email}), 201
+    return jsonify({"message": "User Created Successfully", "user_id": newUser.id, "name": newUser.firstname, "email": newUser.email}), 201
 
 
 # Token generation function
