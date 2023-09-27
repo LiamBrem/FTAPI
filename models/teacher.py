@@ -1,6 +1,7 @@
-from app import db 
+from app import db
+from .user import UserModel
 
-class TeacherModel(db.Model):
+class TeacherModel(UserModel):
     __tablename__ = 'teacher'
 
     id = db.Column(db.String(80), unique=True, primary_key=True)
