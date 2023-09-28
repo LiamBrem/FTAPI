@@ -1,12 +1,13 @@
 from .user import UserModel
 from app import db
-#import mappend_column
-from sqlalchemy.orm import mapped_column
+
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
 
 class StudentModel(UserModel):
     __tablename__ = 'students'
     #parents is the name of the table
-    parent_id = mapped_column(db.ForeignKey('parents.id')) 
+    parent_id = db.Column(db.String(16), db.ForeignKey('parents.id'), nullable=True)
     parent = db.relationship('ParentModel', back_populates='children')
     grade = db.Column(db.Integer, nullable=True)
 

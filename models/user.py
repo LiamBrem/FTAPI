@@ -1,7 +1,7 @@
 from app import db 
 
 class UserModel(db.Model):
-    id = db.Column(db.String(80), unique=True, primary_key=True)
+    id = db.Column(db.String(16), unique=True, primary_key=True)
     firstname = db.Column(db.String(80), unique=False, nullable=False)
     lastname = db.Column(db.String(80), unique=False, nullable=False)
     email = db.Column(db.String(80), unique=False, nullable=False)

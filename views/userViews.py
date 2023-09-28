@@ -55,6 +55,8 @@ def create_user():
 
     if not id or not firstname or not lastname or not email:
         return jsonify({"message": "Missing required fields"}), 400
+    
+    print("ROLE:", role)
 
     if role == "teacher":
         # Teachers require an additional 'subject' parameter
@@ -74,7 +76,7 @@ def create_user():
     elif role == "student":
         # Students require an additional 'grade_level' parameter
         grade = data.get("grade")
-        print(grade)
+        parent_id = data.get("parent_id")
 
         if not grade:
             return jsonify({"message": "Missing 'grade' field for student"}), 400
@@ -86,6 +88,7 @@ def create_user():
             email=email,
             date_of_birth=date_of_birth,
             password=password,
+            parent_id=parent_id,
             grade=grade,
         )
     elif role == "parent":
