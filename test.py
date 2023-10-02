@@ -25,9 +25,9 @@ def checkHttp():
     "password": "securepassword",   
     }
 
-    response = requests.post(f'{BASE_URL}/user', json=parent_data)
+    response = requests.post(f'{BASE_URL}/user', json=student_data)
     if response.status_code == 201:
-        print("Parent user created successfully!")
+        print("Student user created successfully!")
         print(response.json())
     else:
         print("Error creating student user:")

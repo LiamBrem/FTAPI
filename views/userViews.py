@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request, Blueprint
 
-from app import app
+from app import app, mongo
 import random, string, datetime, jwt
 
 userBP = Blueprint("userBP", __name__)
@@ -9,8 +9,10 @@ userBP = Blueprint("userBP", __name__)
 @userBP.route("/user/<string:id>", methods=["GET"])
 def get_user(id):
     # Assuming you want to retrieve a user with a specific ID
+    collection = mongo.db.students
+    data = collection.find()
     
-    return jsonify({"message": "User not found"})
+    return jsonify({"data": [user for user in data]})
 
 
 def makeID():
@@ -49,7 +51,21 @@ def create_user():
 
     elif role == "student":
         # create student
-        pass
+        collection = mongo.db.students
+        result = collection.insert_one({
+            "id": id,
+            "firstname": firstname,
+            "lastname": lastname,
+            "email": email,
+            "date_of_birth": date_of_birth,
+            "password": password,
+            "parent_id": data.get("parent_id"),
+            "grade": data.get("grade")    
+        })
+
+        return jsonify({"message": "Student Created Successfully"}), 201
+
+        
     elif role == "parent":
         #create parent
         pass
