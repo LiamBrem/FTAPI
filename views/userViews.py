@@ -1,12 +1,6 @@
 from flask import Flask, jsonify, request, Blueprint
 
-# import parent, teacher, and student models
-from models.user import UserModel
-from models.teacher import TeacherModel
-from models.student import StudentModel
-from models.parent import ParentModel
-
-from app import db, app
+from app import app
 import random, string, datetime, jwt
 
 userBP = Blueprint("userBP", __name__)
@@ -15,18 +9,8 @@ userBP = Blueprint("userBP", __name__)
 @userBP.route("/user/<string:id>", methods=["GET"])
 def get_user(id):
     # Assuming you want to retrieve a user with a specific ID
-    user = UserModel.query.get(id)
-    if user:
-        return jsonify(
-            {
-                "message": "success",
-                "user_id": user.id,
-                "name": user.name,
-                "email": user.email,
-            }
-        )
-    else:
-        return jsonify({"message": "User not found"}), 404
+    
+    return jsonify({"message": "User not found"})
 
 
 def makeID():
@@ -60,64 +44,21 @@ def create_user():
 
     if role == "teacher":
         # Teachers require an additional 'subject' parameter
-        subject = data.get("subject")
+        # create new teacher
+        pass
 
-        if not subject:
-            return jsonify({"message": "Missing 'subject' field for teacher"}), 400
-        newUser = TeacherModel(
-            id=id,
-            firstname=firstname,
-            lastname=lastname,
-            email=email,
-            date_of_birth=date_of_birth,
-            password=password,
-            subject=subject,
-        )
     elif role == "student":
-        # Students require an additional 'grade_level' parameter
-        grade = data.get("grade")
-        parent_id = data.get("parent_id")
-
-        if not grade:
-            return jsonify({"message": "Missing 'grade' field for student"}), 400
-
-        newUser = StudentModel(
-            id=id,
-            firstname=firstname,
-            lastname=lastname,
-            email=email,
-            date_of_birth=date_of_birth,
-            password=password,
-            parent_id=parent_id,
-            grade=grade,
-        )
+        # create student
+        pass
     elif role == "parent":
-        newUser = ParentModel(
-            id=id,
-            firstname=firstname,
-            lastname=lastname,
-            email=email,
-            date_of_birth=date_of_birth,
-            password=password,
-        )
+        #create parent
+        pass
     else:
         return jsonify({"message": "Invalid role"}), 400
+    
+    return jsonify({"message": "User Created Successfully"}), 201
 
-    # Assuming you have a database session called db_session to add and commit the user
-    db.session.add(newUser)
-    db.session.commit()
 
-    return (
-        jsonify(
-            {
-                "message": "User Created Successfully",
-                "user_id": newUser.id,
-                "name": newUser.firstname,
-                "email": newUser.email,
-            }
-        ),
-        201,
-    )
 
 
 # Token generation function
@@ -138,13 +79,6 @@ def login():
     username = data.get("username")
     password = data.get("password")
 
-    # check if username and password are correct
-    user = UserModel.query.filter_by(username=username).first()
-    if user and user.password == password:
-        token = generate_token(username)
-        return jsonify({"token": token})
-    else:
-        return jsonify({"message": "Authentication failed"}), 401
 
 
 # Protected route
