@@ -26,7 +26,7 @@ def checkHttp():
     "password": "securepassword",   
     }
 
-    response = requests.post(f'{BASE_URL}/user', json=teacher_data)
+    response = requests.get(f'{BASE_URL}/user', json=teacher_data)
     if response.status_code == 201:
         print("Stuedent user created successfully!")
         print(response.json())
@@ -35,19 +35,19 @@ def checkHttp():
         print(response.status_code)
         print(response.content)
 
-def checkGetUser():
+def checkMakeFam():
     app.app_context().push()
-    student_data = {
-        "firstname": "John",
-        "lastname": "Doe",
+    data = {
+        "family_id": "651c5d6390e91140d159b1c8",
+        "user_id": "651b06db9517256db536f5f2",
         "role": "student",
     }
 
-    response = requests.get(f'{BASE_URL}/user/get_user_id', json=student_data)
+    response = requests.put(f'{BASE_URL}/family/update_family', json=data)
     print(response.content)
 
 
 
 
-checkGetUser()
+checkMakeFam()
 
