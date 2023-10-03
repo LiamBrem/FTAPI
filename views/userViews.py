@@ -7,7 +7,7 @@ from models import Student, Teacher, Parent
 userBP = Blueprint("userBP", __name__)
 
 
-@app.route('/get_student_id', methods=['GET'])
+@app.route('/user/get_student_id', methods=['GET'])
 def get_student_id():
     data = request.get_json()
     firstname = data.get("firstname")
@@ -68,9 +68,10 @@ def create_user():
     firstname = data.get("firstname")
     lastname = data.get("lastname")
     email = data.get("email")
-    role = data.get("role")
     date_of_birth = data.get("date_of_birth")
     password = data.get("password")
+
+    role = data.get("role")
 
     if not firstname or not lastname or not email:
         return jsonify({"message": "Missing required fields"}), 400
@@ -80,40 +81,20 @@ def create_user():
     if role == "teacher":
         # create new teacher
         collection = mongo.db.teachers
-        result = collection.insert_one({
-            "firstname": firstname,
-            "lastname": lastname,
-            "email": email,
-            "date_of_birth": date_of_birth,
-            "password": password,
-        })
-
-        return jsonify({"message": "Teacher Created Successfully"}), 201
-        
-
+        new_user = Teacher(firstname, lastname, email, password, date_of_birth)        
     elif role == "student":
         # create student
         collection = mongo.db.students
-        result = collection.insert_one({
-            "firstname": firstname,
-            "lastname": lastname,
-            "email": email,
-            "date_of_birth": date_of_birth,
-            "password": password,
-            "parent_id": data.get("parent_id"),
-            "grade": data.get("grade")    
-        })
-
-        return jsonify({"message": "Student Created Successfully"}), 201
-
-        
+        new_user = Student(firstname, lastname, email, password, date_of_birth, data.get("parent_id"), data.get("grade")) 
     elif role == "parent":
-        #create parent
-        pass
+        collection = mongo.db.parents
+        new_user = Parent(firstname, lastname, email, password, date_of_birth)
     else:
         return jsonify({"message": "Invalid role"}), 400
     
-    return jsonify({"message": "User Created Successfully"}), 201
+
+    result = collection.insert_one(new_user.__dict__)
+    return jsonify({"message": f"{role} Created Successfully"}), 201
 
 
 
