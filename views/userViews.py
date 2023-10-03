@@ -7,58 +7,31 @@ from models import Student, Teacher, Parent
 userBP = Blueprint("userBP", __name__)
 
 
-@app.route('/user/get_student_id', methods=['GET'])
+@app.route('/user/get_user_id', methods=['GET'])
 def get_student_id():
     data = request.get_json()
     firstname = data.get("firstname")
     lastname = data.get("lastname")
+    role = data.get("role")
 
-    collection = mongo.db.students
+    #select the collection based on the role
+    if role == "student":
+        collection = mongo.db.students
+    elif role == "teacher":
+        collection = mongo.db.teachers
+    elif role == "parent":
+        collection = mongo.db.parents
+    else:
+        return jsonify({"message": "Invalid role"}), 400
 
     # Query the MongoDB collection to find the student by first and last name
-    student_data = collection.find_one({'firstname': firstname, 'lastname': lastname})
+    user_data = collection.find_one({'firstname': firstname, 'lastname': lastname})
 
-    if student_data:
-        student_id = str(student_data['_id'])
-        return f"The ID of {firstname} {lastname} is {student_id}"
+    if user_data:
+        user_id = str(user_data['_id'])
+        return f"The ID of {firstname} {lastname} is {user_id}"
     else:
-        return f"No student found with the name {firstname} {lastname}"
-
-# create a post route that allows the user to link a student and a parent together and then it adds it to a family document in the database
-#this should be allowed to have more than 1 parent and 1 student per family
-@userBP.route("/user/family", methods=["POST"])
-def create_family():
-    data = request.get_json()
-    student_id = data.get("student_id")
-    parent_id = data.get("parent_id")
-
-    collection = mongo.db.families
-    result = collection.insert_one({
-        "student_id": student_id,
-        "parent_id": parent_id
-    })
-
-    return jsonify({"message": "Family Created Successfully"}), 201
-
-# now make a route that adds a student to an existing family
-@userBP.route("/user/family/<string:id>", methods=["PUT"])
-def update_family(id):
-    data = request.get_json()
-    student_id = data.get("student_id")
-    parent_id = data.get("parent_id")
-
-    collection = mongo.db.families
-    result = collection.update_one({
-        "_id": id
-    }, {
-        "$set": {
-            "student_id": student_id,
-            "parent_id": parent_id
-        }
-    })
-
-    return jsonify({"message": "Family Updated Successfully"}), 201
-
+        return f"No user found with the name {firstname} {lastname}"
 
 
 

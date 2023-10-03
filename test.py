@@ -40,15 +40,14 @@ def checkGetUser():
     student_data = {
         "firstname": "John",
         "lastname": "Doe",
+        "role": "student",
     }
 
-    response = requests.get(f'{BASE_URL}/user/get_student_id', json=student_data)
+    response = requests.get(f'{BASE_URL}/user/get_user_id', json=student_data)
     print(response.content)
 
 
 
 
-#checkHttp()
-checkGetUser()  
-
+checkGetUser()
 
