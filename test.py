@@ -16,18 +16,18 @@ def checkHttp():
     "grade": "10",    
     }
 
-    parent_data = {
+    teacher_data = {
     "firstname": "John",
     "lastname": "Doe",
     "email": "johndoe@example.com",
-    "role": "parent",
+    "role": "teacher",
     "date_of_birth": "2000-01-01", 
     "password": "securepassword",   
     }
 
-    response = requests.post(f'{BASE_URL}/user', json=student_data)
+    response = requests.post(f'{BASE_URL}/user', json=teacher_data)
     if response.status_code == 201:
-        print("Student user created successfully!")
+        print("Teacher user created successfully!")
         print(response.json())
     else:
         print("Error creating student user:")
