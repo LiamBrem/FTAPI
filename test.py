@@ -47,7 +47,5 @@ def checkMakeFam():
     print(response.content)
 
 
-
-
 checkMakeFam()
 
