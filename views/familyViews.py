@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, Blueprint
 
 from app import app, mongo
+from bson import ObjectId
 
 familyBP = Blueprint("familyBP", __name__)
 
@@ -52,10 +53,11 @@ def create_family():
 # now make a route that adds a student to an existing family
 @familyBP.route("/family/update_family", methods=["PUT"])
 def update_family():
+
     data = request.get_json()
     user_id = data.get("user_id")
     role = data.get("role")
-    family_id = data.get("family_id")
+    family_id = ObjectId(data.get("family_id"))
 
     family = mongo.db.families.find_one({"_id": family_id})
 
