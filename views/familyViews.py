@@ -5,6 +5,7 @@ from bson import ObjectId
 
 familyBP = Blueprint("familyBP", __name__)
 
+
 @familyBP.route("/family/get_family_id", methods=["GET"])
 def get_family_id():
     data = request.get_json()
@@ -36,24 +37,25 @@ def create_family():
     collection = mongo.db.families
 
     # Check if the family already exists with the given student_id and parent_id - this may need to be changed if students have more than one family
-    existing_family = collection.find_one({"students": student_id, "parents": parent_id})
+    existing_family = collection.find_one(
+        {"students": student_id, "parents": parent_id}
+    )
     if existing_family:
-        return jsonify({"message": "Family with this student and parent already exists"}), 400
+        return (
+            jsonify({"message": "Family with this student and parent already exists"}),
+            400,
+        )
 
-    
     # Create a new family document with the provided student and parent
-    new_family = {
-        "students": [student_id],
-        "parents": [parent_id]
-    }
+    new_family = {"students": [student_id], "parents": [parent_id]}
 
     result = collection.insert_one(new_family)
     return jsonify({"message": "Family Created Successfully"}), 201
 
+
 # now make a route that adds a student to an existing family
 @familyBP.route("/family/update_family", methods=["PUT"])
 def update_family():
-
     data = request.get_json()
     user_id = data.get("user_id")
     role = data.get("role")
@@ -75,6 +77,5 @@ def update_family():
         collection.update_one({"_id": family_id}, {"$addToSet": {"parents": user_id}})
     else:
         return jsonify({"message": "Invalid role"}), 400
-    
 
     return jsonify({"message": "Family Updated Successfully"}), 201
